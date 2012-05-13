@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Entry Form</title>
+  </head>
+
+  <body>
+    <h1>Create new entry</h1>
+
+    <form method="post">
+      <label>
+        <div>title</div>
+        <input type="text" name="title" value="{{title}}">
+      </label>
+
+      <label>
+        <div>entry</div>
+        <textarea name="entry">{{entry}}</textarea>
+      </label>
+
+      <div class="error">{{error}}</div>
+
+      <input type="submit">
+    </form>
+  </body>
+</html>
