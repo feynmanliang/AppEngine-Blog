@@ -1,21 +1,10 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
 
-<html>
-  <head>
-    <title>Entries</title>
-  </head>
+{% block content %}
 
-  <body>
-    <h1>Entries</h1>
-    <a href="/newpost">New Post</a>
+  {% for p in posts %}
+    {{ p.render() | safe }}
+    <br><br>
+  {% endfor %}
 
-    {% for entry in entries %}
-    <hr>
-    <div class="entry">
-      <div class="entry-title">{{entry.title}}</div>
-      <pre class="entry-body">{{entry.entry}}</pre>
-    </div>
-    {% endfor %}
-
-  </body>
-</html>
+{% endblock %}
