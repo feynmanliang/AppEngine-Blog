@@ -59,25 +59,42 @@ class MainPage(BlogHandler):
       self.write('Hello, Udacity! Go to: <a href="/blog">blog</a>')
 
 
+##
+## Memcached get contents
+def getFront(update = False):
+    cachekey = 'top'
+    posts = memcache.get(cachekey)
 
+    if posts is None or update:
+        logging.error("DB QUERY")
+        posts = db.GqlQuery("select * from Post order by created desc limit 10")
+
+        posts = list(posts)
+        memcache.set(cachekey, posts)
+        memcache.set('update', time.time())
+    return posts
+
+def getPost(post_id, update = False):
+    cachekey = 'permalink' + str(post_id)
+    permalink = memcache.get(cachekey)
+
+    if permalink is None or update:
+        logging.error("DB QUERY")
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        permalink = db.get(key)
+
+        memcache.set(cachekey, permalink)
+        memcache.set('update_'+str(post_id), time.time())
+    return permalink
+
+
+##
+## Content handlers
 class BlogFront(BlogHandler):
     def get(self):
-        posts = self.getFront()
+        posts = getFront()
         timesince = int(time.time() - memcache.get('update'))
         self.render('front.html', posts = posts, timesince = timesince)
-
-    def getFront(self, update = False):
-        cachekey = 'top'
-        posts = memcache.get(cachekey)
-
-        if posts is None or update:
-            logging.error("DB QUERY")
-            posts = db.GqlQuery("select * from Post order by created desc limit 10")
-
-            posts = list(posts)
-            memcache.set(cachekey, posts)
-            memcache.set('update', time.time())
-        return posts
 
 class PostPage(BlogHandler):
     def get(self, post_id):
@@ -87,7 +104,7 @@ class PostPage(BlogHandler):
         # if not post:
         #     self.error(404)
         #     return
-        post = self.getPost(post_id)
+        post = getPost(post_id)
         updateid = 'update_' + str(post_id)
         timesince = int(time.time() - memcache.get(updateid))
 
@@ -96,19 +113,6 @@ class PostPage(BlogHandler):
             return
 
         self.render("permalink.html", post = post, timesince = timesince)
-
-    def getPost(self, post_id, update = False):
-        cachekey = 'permalink' + str(post_id)
-        permalink = memcache.get(cachekey)
-
-        if permalink is None or update:
-            logging.error("DB QUERY")
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            permalink = db.get(key)
-
-            memcache.set(cachekey, permalink)
-            memcache.set('update_'+str(post_id), time.time())
-        return permalink
 
 class NewPost(BlogHandler):
     def get(self):
@@ -121,7 +125,7 @@ class NewPost(BlogHandler):
         if subject and content:
             p = Post(parent = blog_key(), subject = subject, content = content)
             p.put()
-            BlogFront.getFront(update=True)
+            getFront(update=True)
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
