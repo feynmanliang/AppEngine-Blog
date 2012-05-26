@@ -26,6 +26,7 @@ label {
 #footer {
     display: block;
     float: right;
+    color: #999;
 }
 
 label + label {
