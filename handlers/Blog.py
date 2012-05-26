@@ -60,7 +60,7 @@ class MainPage(BlogHandler):
 
 
 ##
-## Memcached get contents
+## Memcache methods and handlers
 def getFront(update = False):
     cachekey = 'top'
     posts = memcache.get(cachekey)
@@ -87,6 +87,10 @@ def getPost(post_id, update = False):
         memcache.set('update_'+str(post_id), time.time())
     return permalink
 
+class CacheClear(BlogHandler):
+    def get(self):
+        memcache.flush_all()
+        self.redirect('/blog')
 
 ##
 ## Content handlers

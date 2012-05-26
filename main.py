@@ -33,6 +33,7 @@ app = WSGIApplication([
     (r'/blog/logout', 'handlers.Auth.Logout'),
     (r'/blog/welcome/?', 'handlers.Auth.Welcome'),
     (r'/blog/.json', 'handlers.Json.JsonFeed'),
-    (r'/blog/([0-9]+).json', 'handlers.Json.JsonPost')
+    (r'/blog/([0-9]+).json', 'handlers.Json.JsonPost'),
+    (r'/blog/flush', 'handlers.Blog.CacheClear')
  ],
  debug=True)
