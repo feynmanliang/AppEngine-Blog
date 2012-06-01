@@ -1,4 +1,4 @@
-Udacity-CS253
+Web App Engine Code
 =============
 
-Repo for code written during CS253 on udacity.com
+Web App Engine code that I wrote for a web application engineering course
